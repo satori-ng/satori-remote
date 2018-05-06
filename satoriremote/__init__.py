@@ -9,6 +9,7 @@ __email__ = 'satori_ng@email.com'
 
 AVAILABLE_PROTOCOLS = [
     'sftp',
+    'ssh',
     # 'smb',
 ]
 
@@ -66,11 +67,11 @@ and opens a connection
 
         return load(
                     conn_dict['host'], conn_dict['username'],
-                    
+
                     password=conn_dict['auth'] if conn_dict['auth_type'] == 'passwd' else None,
                     pub_key_path=conn_dict['auth'] if conn_dict['auth_type'] == 'key' else None,
                     port=conn_dict['port'],
-                )
+                ), conn_dict['host']
 
     raise ConnectionError("Connection could not be made!")
 

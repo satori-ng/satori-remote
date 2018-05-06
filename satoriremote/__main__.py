@@ -23,8 +23,7 @@ if args.list:
 	print (satoriremote.AVAILABLE_PROTOCOLS) 
 if args.remote:
 	
-	conn = satoriremote.connect(args.remote)
-	print(conn)
+	conn, host = satoriremote.connect(args.remote)
 	with conn as obj:
 		if obj:
 			print ("[+] Connection Successful!")
