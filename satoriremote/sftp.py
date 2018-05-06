@@ -5,18 +5,21 @@ import paramiko
 
 
 @contextmanager
-def load(host, username, password=None, pub_key_path=None, port=None):
-	if port is None:
-		port=22	# default
+def load(connection_dict):
 
 	# Open a transport
-	transport = paramiko.Transport((host, port))
+	transport = paramiko.Transport(
+			(
+				connection_dict['host'],
+				connection_dict['port']
+			)
+		)
 	# transport.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 	# Auth
 	transport.connect(
-			username=username,
-			password=password,
+			username=connection_dict['username'],
+			password=connection_dict['auth'],
 		)
 
 	# Go!

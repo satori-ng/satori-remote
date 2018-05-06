@@ -10,26 +10,37 @@ __email__ = 'satori_ng@email.com'
 AVAILABLE_PROTOCOLS = [
     'sftp',
     'ssh',
-    # 'smb',
+    'smb',
 ]
 
 
 def parse_conn_string(conn_string):
-    arg_regex = r'(\w*)://((\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?'
+# (\w*)://(((\w+)\\)?(\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?(:(.+))?
+    arg_regex = r'(\w*)://(((\w+)\\)?(\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?(%(.+))?'
+    # arg_regex = r'(\w*)://((\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?'
     m = re.match(arg_regex, conn_string)
 
     try:
         conn_dict={}
         conn_dict['protocol'] = m.group(1)
-        conn_dict['username'] = m.group(3)
-        conn_dict['auth_type'] = "key" if m.group(5) == '#' else "passwd"
-        conn_dict['auth'] = m.group(6)
-        conn_dict['host'] =  m.group(7)
+        conn_dict['domain'] = m.group(4)
+        conn_dict['username'] = m.group(5)
+        conn_dict['auth_type'] = "key" if m.group(7) == '#' else "passwd"
+        conn_dict['auth'] = m.group(8)
+        conn_dict['host'] =  m.group(9)
         try:
-            conn_dict['port'] = int(m.group(9))
+            conn_dict['port'] = int(m.group(11))
         except: # if :port is not defined
-            conn_dict['port'] = None
-            pass
+            if conn_dict['protocol'] == 'smb':
+                conn_dict['port'] = 445
+            elif conn_dict['protocol'] in ['ssh', 'sftp']:
+                conn_dict['port'] = 22
+            elif conn_dict['protocol'] == 'ftp':
+                conn_dict['port'] = 21
+            else:
+                conn_dict['port'] = None
+
+        conn_dict['path'] =  m.group(13)
 
         if conn_dict['username'] is None:
             conn_dict['username'] = raw_input("Username:")
@@ -68,15 +79,18 @@ and opens a connection
     if conn_dict['protocol'] in ['sftp', 'ssh']:
         from satoriremote.sftp import load
 
-        return load(
-                    conn_dict['host'], conn_dict['username'],
+    elif conn_dict['protocol'] in ['smb']:
+        from satoriremote.smb import load
 
-                    password=conn_dict['auth'] if conn_dict['auth_type'] == 'passwd' else None,
-                    pub_key_path=conn_dict['auth'] if conn_dict['auth_type'] == 'key' else None,
-                    port=conn_dict['port'],
-                ), conn_dict['host']
+    else:
+        raise ConnectionError(
+                "Protocol '{}' not available".format(
+                    conn_dict['protocol']
+                )
+            )
 
-    raise ConnectionError("Connection could not be made!")
+    return load(conn_dict), conn_dict
+
 
 
 # con_arg = 'sftp://unused:pass@172.16.47.212'
