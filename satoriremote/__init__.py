@@ -25,7 +25,7 @@ def parse_conn_string(conn_string):
         conn_dict['auth_type'] = "key" if m.group(5) == '#' else "passwd"
         conn_dict['auth'] = m.group(6)
         conn_dict['host'] =  m.group(7)
-        conn_dict['port'] = m.group(8)
+        conn_dict['port'] = int(m.group(9))
 
         if conn_dict['username'] is None:
             conn_dict['username'] = raw_input("Username:")
@@ -33,7 +33,6 @@ def parse_conn_string(conn_string):
         if conn_dict['auth'] is None:
             import getpass
             conn_dict['auth'] = getpass.getpass("Password:")
-
         return conn_dict
     except AttributeError:
         raise ValueError("'{}' is not a valid remote argument".format(conn_string))

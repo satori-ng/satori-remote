@@ -6,8 +6,8 @@ import satoriremote
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--remote", 
-		help="",
+parser.add_argument("remote", 
+		help="The connection string to test",
 	)
 
 parser.add_argument("--list", 
