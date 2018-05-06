@@ -29,10 +29,7 @@ def load(host, username, password=None, pub_key_path=None, port=None):
 	# Close
 	sftp.close()
 	transport.close()
-	# print ("Closed")
 
-
-	# print (f.listdir('/'))
 
 class SatoriSFTPContext(object):
 

@@ -25,7 +25,11 @@ def parse_conn_string(conn_string):
         conn_dict['auth_type'] = "key" if m.group(5) == '#' else "passwd"
         conn_dict['auth'] = m.group(6)
         conn_dict['host'] =  m.group(7)
-        conn_dict['port'] = int(m.group(9))
+        try:
+            conn_dict['port'] = int(m.group(9))
+        except: # if :port is not defined
+            conn_dict['port'] = None
+            pass
 
         if conn_dict['username'] is None:
             conn_dict['username'] = raw_input("Username:")
