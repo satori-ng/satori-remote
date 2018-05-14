@@ -5,7 +5,9 @@ __name__ = 'satori-remote'
 __desc__ = 'Package for Remote acquisition of Satori Images'
 __email__ = 'satori_ng@email.com'
 
-
+# input() fix for python2/3
+try: input = raw_input 
+except NameError: pass    
 
 AVAILABLE_PROTOCOLS = [
     'sftp',
@@ -42,7 +44,7 @@ def parse_conn_string(conn_string):
         conn_dict['path'] =  m.group(13)
 
         if conn_dict['username'] is None:
-            conn_dict['username'] = raw_input("Username:")
+            conn_dict['username'] = input("Username: ")
 
         if conn_dict['auth'] is None:
             import getpass

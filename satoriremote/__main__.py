@@ -18,6 +18,9 @@ parser.add_argument("--list", '-l',
 
 args = parser.parse_args()
 
+if not args.list and not args.remote:
+	parser.print_usage()
+	sys.exit(-1)
 
 if args.list:
 	print (satoriremote.AVAILABLE_PROTOCOLS) 
