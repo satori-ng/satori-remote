@@ -15,9 +15,8 @@ AVAILABLE_PROTOCOLS = [
 
 
 def parse_conn_string(conn_string):
-# (\w*)://(((\w+)\\)?(\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?(:(.+))?
-    arg_regex = r'(\w*)://(((\w+)\\)?(\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?(%(.+))?'
-    # arg_regex = r'(\w*)://((\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?'
+
+    arg_regex = r'(\w*)://(((\w+)\\)?(\w*)(([:#])(.+))?@)?([\.\w]*)(\:(\d+))?(/(.+))?'
     m = re.match(arg_regex, conn_string)
 
     try:
