@@ -1,20 +1,27 @@
 from setuptools import setup
 
-import satoriremote as setupmod
+import satoricore
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 setup(
-    name=setupmod.__name__,
-    description=setupmod.__desc__,
-    version=setupmod.__version__,
+    name=satoricore.__name__,
+    description=satoricore.__desc__,
+    version=satoricore.__version__,
 
     author="Satori-NG org",
-    author_email=setupmod.__email__,
+    author_email=satoricore.__email__,
 
-    packages=["satoriremote"],
+    packages=["satoricore"],
 
-    # entry_points={
-    #     "console_scripts": [
-    #         "hexwordify=hexwordify.__main__:main",
-    #     ],
-    # },
+    entry_points={
+        "console_scripts": [
+            "satori-file=satoricore.file.__main__:main",
+        ],
+    },
+    install_requires=requirements,
+
 )
+
+# python -m unittest discover tests
