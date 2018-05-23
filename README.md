@@ -39,10 +39,10 @@ logrotate.conf
 locale.conf
 [...]
 ```
-If the connection succeeds, equivalents of `stat` and `listdir` will be run, ensuring that a *SatoriImage* can be extracted from the remote host.  
+If the connection succeeds, equivalents of `stat` and `listdir` will be run, ensuring that a *SatoriImage* can be extracted from the remote host.
 
 
-It accepts URL strings like:
+The connection argument accepts URL strings like:
 ```
   smb://username@host:445
   smb://username@host:445//SMBSHARE/share_folder/share_file
