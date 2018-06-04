@@ -54,6 +54,16 @@ def parse_conn_string(conn_string):
         raise ValueError("'{}' is not a valid remote argument".format(conn_string))
 
 
+def test_connection(host, port):
+    import socket
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    try:
+        s.connect((host, port))
+        s.close()
+        return True
+    except ConnectionError:
+        return False
+
 
 def connect(remote_arg):
     """
@@ -75,7 +85,7 @@ and opens a connection
     # pprint.pprint (conn_dict)     # TODO: Get it to debug logs
 
     if conn_dict['protocol'] not in AVAILABLE_PROTOCOLS:
-        raise ValueError("Protocol '{}' not available".format(protocol))
+        raise ValueError("Protocol '{}' not available".format(conn_dict['protocol']))
 
     if conn_dict['protocol'] in ['sftp', 'ssh']:
         from satoriremote.sftp import load
@@ -88,6 +98,11 @@ and opens a connection
                 "Protocol '{}' not available".format(
                     conn_dict['protocol']
                 )
+            )
+
+    if not test_connection(conn_dict['host'], conn_dict['port']):
+        raise ConnectionError("Connection to {}:{} refused"
+            .format(conn_dict['host'], conn_dict['port']),
             )
 
     return load(conn_dict), conn_dict
