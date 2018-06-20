@@ -1,7 +1,9 @@
 
 from contextlib import contextmanager
 
+import io
 import os
+
 from smb.SMBConnection import SMBConnection
 import smb.smb_structs
 
@@ -49,14 +51,14 @@ class SatoriSMBContext(object):
 		self.path.isdir = self.is_dir
 		self.share = share
 
-	def __strip_share(self, path):
+	def _strip_share(self, path):
 		if path.startswith(self.share):
 			return path[len(self.share)+1:]
 		return path
 
 	def listdir(self, path):
 		try:
-			files = self.smb_connection.listPath(self.share, self.__strip_share(path))
+			files = self.smb_connection.listPath(self.share, self._strip_share(path))
 		except smb.smb_structs.OperationFailure:
 			logger.info("Could not list Directory '{}' in share '{}'"
 					.format(path, self.share)
@@ -74,10 +76,10 @@ class SatoriSMBContext(object):
 		# print(self.share, self.__strip_share(path))
 		# import pdb; pdb.set_trace();
 		try:
-			attrs = self.smb_connection.getAttributes(self.share, self.__strip_share(path))
+			attrs = self.smb_connection.getAttributes(self.share, self._strip_share(path))
 		except smb.smb_structs.OperationFailure:
 			logger.info("Could not get Attributes of '{}' in share '{}'"
-				.format(self.__strip_share(path), self.share)
+				.format(self._strip_share(path), self.share)
 			)
 			return SatoriSMBContext.smb_stat_result()
 
@@ -85,14 +87,14 @@ class SatoriSMBContext(object):
 
 	def lstat(self, path):
 		# print(self.share, self.__strip_share(path))
-		return self.stat(self.__strip_share(path))
+		return self.stat(self._strip_share(path))
 
 	def is_dir(self, path):
 		try:
-			return self.smb_connection.getAttributes(self.share, self.__strip_share(path)).isDirectory
+			return self.smb_connection.getAttributes(self.share, self._strip_share(path)).isDirectory
 		except smb.smb_structs.OperationFailure:
 			logger.info("Could not get Attributes of '{}' in share '{}'"
-				.format(self.__strip_share(path), self.share)
+				.format(self._strip_share(path), self.share)
 			)
 			return False
 
@@ -115,3 +117,58 @@ class SatoriSMBContext(object):
 
 			for k, v in self.items():
 				setattr(self, k, v)
+
+
+	# @contextmanager
+	def open(self, path, mode='r', **kwrags):
+		path = self._strip_share(path)
+		smb_fd = SatoriSMBContext.smb_file_descriptor(path, self.share, self.smb_connection)
+		# yield smb_fd
+		return smb_fd
+		smb_fd.close()
+
+
+	class smb_file_descriptor(object):
+
+		def __enter__(self):
+			return self
+
+		def __exit__(self, *args, **kwargs):
+			pass
+
+
+		def __init__(self, path, share, smb_connection):
+			self.path = path
+			self.seek_offset = 0
+			self.share = share
+			self.conn = smb_connection
+
+		def seek(self, offset):
+			self.seek_offset = offset
+
+		def read(self, offset=0):
+			if offset == 0:
+				offset = -1
+
+			ret = io.BytesIO()
+			attrs, read_n = self.conn.retrieveFileFromOffset(
+					self.share,
+					self.path,
+					ret,
+					offset=self.seek_offset,
+					max_length=offset,
+				)
+			# print(attrs, read_n)
+			self.seek_offset += read_n
+			return ret.getvalue()
+
+			#	f = self.open("C$/USers/IEUSER/Downloads/desktop.ini")
+			#	f.read()
+
+			#	with self.open("C$/USers/IEUSER/Downloads/desktop.ini") as f: f.read()
+
+		def close(self):
+			'''
+				No need to deallocate any object
+			'''
+			return
