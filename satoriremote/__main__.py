@@ -9,7 +9,7 @@ def main():
 
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument("--remote", '-r',
+	parser.add_argument("--check", '-c',
 			help="The connection string to test",
 		)
 
@@ -20,15 +20,15 @@ def main():
 
 	args = parser.parse_args()
 
-	if not args.list and not args.remote:
+	if not args.list and not args.check:
 		parser.print_usage()
 		sys.exit(-1)
 
 	if args.list:
 		print (satoriremote.AVAILABLE_PROTOCOLS) 
 
-	if args.remote:
-		conn, conn_dict = satoriremote.connect(args.remote)
+	if args.check:
+		conn, conn_dict = satoriremote.connect(args.check)
 
 		with conn as obj:
 			if obj:
