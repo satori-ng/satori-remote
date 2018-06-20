@@ -119,11 +119,9 @@ class SatoriSMBContext(object):
 				setattr(self, k, v)
 
 
-	# @contextmanager
 	def open(self, path, mode='r', **kwrags):
 		path = self._strip_share(path)
 		smb_fd = SatoriSMBContext.smb_file_descriptor(path, self.share, self.smb_connection)
-		# yield smb_fd
 		return smb_fd
 		smb_fd.close()
 
@@ -135,7 +133,6 @@ class SatoriSMBContext(object):
 
 		def __exit__(self, *args, **kwargs):
 			pass
-
 
 		def __init__(self, path, share, smb_connection):
 			self.path = path
